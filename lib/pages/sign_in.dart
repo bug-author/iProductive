@@ -3,6 +3,7 @@ import 'package:iproductive/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:iproductive/pages/home_page.dart';
 import 'package:iproductive/pages/sign_up.dart';
+import 'package:iproductive/services/auth_service.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -12,6 +13,8 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  AuthClass authClass = AuthClass();
+
   final TextEditingController _emailController = TextEditingController();
 
   final TextEditingController _passwordController = TextEditingController();
@@ -131,6 +134,9 @@ class _SignInPageState extends State<SignInPage> {
                     setState(() {
                       circular = false;
                     });
+
+                    authClass.storeTokenAndData(userCredential);
+
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
