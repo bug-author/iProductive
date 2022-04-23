@@ -15,6 +15,13 @@ class _AddNotePageState extends State<AddNotePage> {
   // TextEditingController _descriptionController = TextEditingController();
   String description = "Not implemented yet";
 
+  // ! to prevent memory leaks
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

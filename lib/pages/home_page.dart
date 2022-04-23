@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iproductive/constants.dart';
 import 'package:iproductive/pages/add_note.dart';
+import 'package:iproductive/pages/sign_in.dart';
+import 'package:iproductive/services/auth_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,11 +14,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  AuthClass authClass = AuthClass();
+  final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+      .collection('notes')
+      .orderBy('date')
+      .snapshots();
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: myAppBar(),
+      appBar: myAppBar(authClass, context),
       body: Container(
         color: darkGreyClr,
         child: Column(
@@ -28,42 +36,53 @@ class _HomePageState extends State<HomePage> {
             ),
             Flexible(
               child: Container(
-                constraints: BoxConstraints(maxWidth: size.width * 0.8),
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onLongPress: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text("Delete Note"),
-                              content: Text("Delete this note?"),
-                              actions: [
-                                TextButton(
-                                  child: Text("Delete"),
-                                  onPressed: () {
-                                    // todo impl
-                                    Navigator.pop(context);
+                  constraints: BoxConstraints(maxWidth: size.width * 0.8),
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: _stream,
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        return ListView.builder(
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> document =
+                                snapshot.data!.docs[index].data()
+                                    as Map<String, dynamic>;
+                            return GestureDetector(
+                              onLongPress: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text("Delete Note"),
+                                      content: Text("Delete this note?"),
+                                      actions: [
+                                        TextButton(
+                                          child: Text("Delete"),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text("No"),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ],
+                                    );
                                   },
-                                ),
-                                TextButton(
-                                  child: Text("No"),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
+                                );
+                              },
+                              child: noteCard(size, document['title']),
                             );
                           },
+                          itemCount: snapshot.data!.docs.length,
                         );
-                      },
-                      child: noteCard(size, "placeholder"),
-                    );
-                  },
-                  itemCount: 2,
-                ),
-              ),
+                      })),
             )
           ],
         ),
@@ -73,13 +92,22 @@ class _HomePageState extends State<HomePage> {
 }
 
 // todo sort by time
-AppBar myAppBar() {
+AppBar myAppBar(AuthClass authClass, BuildContext context) {
   return AppBar(
     backgroundColor: whiteClr,
     elevation: 0,
     actions: [
       IconButton(
-        onPressed: () {},
+        onPressed: () async {
+          await authClass.signOut(context: context);
+
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (builder) => SignInPage(),
+              ),
+              (route) => false);
+        },
         icon: const Icon(
           Icons.logout,
           color: darkGreyClr,
