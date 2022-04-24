@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iproductive/constants.dart';
 import 'package:iproductive/pages/home_page.dart';
+import 'package:iproductive/services/auth_service.dart';
 
 class AddNotePage extends StatefulWidget {
   const AddNotePage({Key? key}) : super(key: key);
@@ -14,6 +15,8 @@ class _AddNotePageState extends State<AddNotePage> {
   final TextEditingController _titleController = TextEditingController();
   // TextEditingController _descriptionController = TextEditingController();
   String description = "Not implemented yet";
+
+  static String? uid = AuthClass().getUid();
 
   // ! to prevent memory leaks
   @override
@@ -117,7 +120,7 @@ class _AddNotePageState extends State<AddNotePage> {
                       ),
                     ),
                     onPressed: () {
-                      _addNote();
+                      _addNote(uid);
                     },
                   ),
                 ],
@@ -129,8 +132,12 @@ class _AddNotePageState extends State<AddNotePage> {
     );
   }
 
-  void _addNote() {
-    FirebaseFirestore.instance.collection('notes').add({
+  void _addNote(String? uid) {
+    FirebaseFirestore.instance
+        .collection('userNotesDaily')
+        .doc(uid)
+        .collection('notes')
+        .add({
       'date': Timestamp.now(),
       'description': description,
       'isDone': false,

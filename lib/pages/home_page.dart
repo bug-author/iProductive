@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iproductive/constants.dart';
 import 'package:iproductive/pages/add_note.dart';
@@ -15,7 +16,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   AuthClass authClass = AuthClass();
+  static String? uid = AuthClass().getUid();
+
   final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+      .collection('userNotesDaily')
+      .doc(uid)
       .collection('notes')
       .orderBy('date', descending: true)
       .snapshots();

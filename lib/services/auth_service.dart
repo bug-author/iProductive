@@ -32,4 +32,10 @@ class AuthClass {
     final snackBar = SnackBar(content: Text(text));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
+  String? getUid() {
+    User? user = _auth.currentUser;
+    final uid = user?.uid;
+    return uid;
+  }
 }
