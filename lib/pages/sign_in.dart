@@ -63,7 +63,7 @@ class _SignInPageState extends State<SignInPage> {
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: "Avenir",
-                  fontSize: 68,
+                  fontSize: 35,
                 ),
               ),
               const SizedBox(

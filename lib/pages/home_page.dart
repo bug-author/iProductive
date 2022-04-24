@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   AuthClass authClass = AuthClass();
   final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
       .collection('notes')
-      .orderBy('date')
+      .orderBy('date', descending: true)
       .snapshots();
 
   @override
@@ -41,9 +41,7 @@ class _HomePageState extends State<HomePage> {
                       stream: _stream,
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
+                          return _noNotesWidget();
                         }
 
                         return ListView.builder(
@@ -63,7 +61,13 @@ class _HomePageState extends State<HomePage> {
                                         TextButton(
                                           child: Text("Delete"),
                                           onPressed: () {
-                                            Navigator.pop(context);
+                                            FirebaseFirestore.instance
+                                                .collection('notes')
+                                                .doc(snapshot
+                                                    .data!.docs[index].id)
+                                                .delete()
+                                                .then((value) =>
+                                                    Navigator.pop(context));
                                           },
                                         ),
                                         TextButton(
@@ -91,7 +95,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// todo sort by time
 AppBar myAppBar(AuthClass authClass, BuildContext context) {
   return AppBar(
     backgroundColor: whiteClr,

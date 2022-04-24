@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.iproductive">
+  <uses-permission android:name="android.permission.INTERNET"/> <!-- Add this -->
    <application
-        android:label="iproductive"
+        android:label="iProductive"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
