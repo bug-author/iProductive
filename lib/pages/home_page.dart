@@ -16,17 +16,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   AuthClass authClass = AuthClass();
-  static String? uid = AuthClass().getUid();
-
-  final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
-      .collection('userNotesDaily')
-      .doc(uid)
-      .collection('notes')
-      .orderBy('date', descending: true)
-      .snapshots();
 
   @override
   Widget build(BuildContext context) {
+    String? uid = AuthClass().getUid();
+    final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+        .collection('userNotesDaily')
+        .doc(uid)
+        .collection('notes')
+        .orderBy('date', descending: true)
+        .snapshots();
+    print(uid);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: myAppBar(authClass, context),
@@ -45,9 +45,13 @@ class _HomePageState extends State<HomePage> {
                   child: StreamBuilder<QuerySnapshot>(
                       stream: _stream,
                       builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
+                        // todo stackoverflow answer
+                        if (!snapshot.hasData || snapshot.data?.size == 0) {
                           return _noNotesWidget();
                         }
+                        // print('hello');
+                        // print(snapshot.data?.size);
+                        // if (snapshot.data.) return _noNotesWidget();
 
                         return ListView.builder(
                           itemBuilder: (context, index) {
