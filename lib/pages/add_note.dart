@@ -94,7 +94,13 @@ class _AddNotePageState extends State<AddNotePage> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pop(context);
+                      // bug fix #5
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (builder) => HomePage(),
+                          ),
+                          (route) => false);
                     },
                   ),
                   ElevatedButton(
